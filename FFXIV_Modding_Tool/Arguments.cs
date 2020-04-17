@@ -18,8 +18,13 @@ namespace FFXIV_Modding_Tool.Commandline
         bool useWizard = false;
         bool importAll = false;
         bool skipProblemCheck = false;
+<<<<<<< HEAD
         Dictionary<List<string>, Action> actionDict = new Dictionary<List<string>, Action>();
         Dictionary<List<string>, Action<string>> argumentDict = new Dictionary<List<string>, Action<string>>();
+=======
+        string requestedAction = "";
+        string wantedItem = "";
+>>>>>>> origin/import-export
 
         public void ArgumentHandler(string[] args)
         {
@@ -92,8 +97,62 @@ Number of mods: {modpackInfo["modAmount"]}"); })},
                     string arg = cmdArg.Split('-').Last();
                     foreach(List<string> argumentList in argumentDict.Keys)
                     {
+<<<<<<< HEAD
                         if (argumentList.Contains(arg))
                             argumentDict[argumentList](nextArg);
+=======
+                        case "h":
+                        case "help":
+                            requestedAction = "h";
+                            continue;
+                        case "v":
+                        case "version":
+                            requestedAction = "v";
+                            continue;
+                        case "g":
+                        case "gamedirectory":
+                            if (!nextArg.StartsWith("-"))
+                            {
+                                MainClass._gameDirectory = new DirectoryInfo(Path.Combine(nextArg, "game"));
+                                MainClass._indexDirectory = new DirectoryInfo(Path.Combine(nextArg, "game", "sqpack", "ffxiv"));
+                            }
+                            continue;
+                        case "c":
+                        case "configdirectory":
+                            if (!nextArg.StartsWith("-"))
+                                MainClass._configDirectory = new DirectoryInfo(nextArg);
+                            continue;
+                        case "b":
+                        case "backupdirectory":
+                            if (!nextArg.StartsWith("-"))
+                                MainClass._backupDirectory = new DirectoryInfo(nextArg);
+                            continue;
+                        case "t":
+                        case "ttmp":
+                            if (!nextArg.StartsWith("-"))
+                                ttmpPath = nextArg;
+                            continue;
+                        case "n":
+                        case "name":
+                            if (!nextArg.StartsWith("-"))
+                                wantedItem = nextArg;
+                            continue;
+                        case "w":
+                        case "wizard":
+                            useWizard = true;
+                            continue;
+                        case "a":
+                        case "all":
+                            importAll = true;
+                            continue;
+                        case "npc":
+                        case "noproblemcheck":
+                            skipProblemCheck = true;
+                            continue;
+                        default:
+                            main.PrintMessage($"Unknown argument {arg}", 3);
+                            continue;
+>>>>>>> origin/import-export
                     }
                 }
             }
@@ -102,17 +161,85 @@ Number of mods: {modpackInfo["modAmount"]}"); })},
                 fullAction = $"{args[0]} {args[1]}";
             foreach(List<string> actionList in actionDict.Keys)
                 {
+<<<<<<< HEAD
                     if (actionList.Contains(args[0]) || actionList.Contains(fullAction))
                     {
                         if (ActionRequirementsChecker(actionList[0]))
                             actionDict[actionList]();
                     }
+=======
+                    case "mpi":
+                        requestedAction = "mpi";
+                        break;
+                    case "mpinfo":
+                        requestedAction = "mpinfo";
+                        break;
+                    case "modpack":
+                        if (secondAction == "import")
+                            goto case "mpi";
+                        if (secondAction == "info")
+                            goto case "mpinfo";
+                        break;
+                    case "mr":
+                        requestedAction = "mr";
+                        break;
+                    case "me":
+                        requestedAction = "me";
+                        break;
+                    case "md":
+                        requestedAction = "md";
+                        break;
+                    case "mex":
+                        requestedAction = "mex";
+                        break;
+                    case "mi":
+                        requestedAction = "mi";
+                        break;
+                    case "mods":
+                        if (secondAction == "refresh")
+                            goto case "mr";
+                        if (secondAction == "enable")
+                            goto case "me";
+                        if (secondAction == "disable")
+                            goto case "md";
+                        break;
+                    case "mod":
+                        if (secondAction == "export")
+                            goto case "mex";
+                        if (secondAction == "import")
+                            goto case "mi";
+                        break;
+                    case "backup":
+                    case "b":
+                        requestedAction = "b";
+                        break;
+                    case "reset":
+                    case "r":
+                        requestedAction = "r";
+                        break;
+                    case "problemcheck":
+                    case "pc":
+                        requestedAction = "pc";
+                        break;
+                    case "version":
+                    case "v":
+                        requestedAction = "v";
+                        break;
+                    case "help":
+                    case "h":
+                        requestedAction = "h";
+                        break;
+                    default:
+                        main.PrintMessage($"Unknown action: {args[0]}");
+                        requestedAction = "h";
+                        break;
+>>>>>>> origin/import-export
                 }
         }
 
         public bool ActionRequirementsChecker(string requestedAction)
         {
-            List<string> requiresGameDirectory = new List<string> { "mpi", "mr", "me", "md", "b", "r", "pc" };
+            List<string> requiresGameDirectory = new List<string> { "mpi", "mr", "me", "md", "mex", "b", "r", "pc" };
             List<string> requiresBackupDirectory = new List<string> { "mpi", "mr", "me", "md", "b", "r", "pc" };
             List<string> requiresConfigDirectory = new List<string> { "mpi", "pc" };
             List<string> requiresUpdatedBackups = new List<string> { "mpi", "mr", "me", "md", "r" };
@@ -207,6 +334,67 @@ Number of mods: {modpackInfo["modAmount"]}"); })},
             return true;
         }
 
+<<<<<<< HEAD
+=======
+        public void ActionHandler()
+        {
+            switch (requestedAction)
+            {
+                case "h":
+                    SendHelpText();
+                    break;
+                case "v":
+                    if (MainClass._gameDirectory == null)
+                        MainClass._gameDirectory = new DirectoryInfo(Path.Combine(config.ReadConfig("GameDirectory"), "game"));
+                    main.CheckVersions();
+                    break;
+                case "mpi":
+                    if (useWizard && importAll)
+                    {
+                        main.PrintMessage("You can't use the import wizard and skip the wizard at the same time", 3);
+                        useWizard = false;
+                        importAll = false;
+                    }
+                    main.ImportModpackHandler(new DirectoryInfo(ttmpPath), useWizard, importAll, skipProblemCheck);
+                    break;
+                case "mpinfo":
+                    Dictionary<string, string> modpackInfo = main.GetModpackInfo(new DirectoryInfo(ttmpPath));
+                    main.PrintMessage($@"Name: {modpackInfo["name"]}
+Type: {modpackInfo["type"]}
+Author: {modpackInfo["author"]}
+Version: {modpackInfo["version"]}
+Description: {modpackInfo["description"]}
+Number of mods: {modpackInfo["modAmount"]}");
+                    break;
+                case "mr":
+                    main.SetModActiveStates();
+                    break;
+                case "me":
+                    main.ToggleModStates(true);
+                    break;
+                case "md":
+                    main.ToggleModStates(false);
+                    break;
+                case "mex":
+                    main.ExportRequestHandler(wantedItem);
+                    break;
+                case "mi":
+                case "b":
+                    main.BackupIndexes();
+                    break;
+                case "r":
+                    main.ResetMods();
+                    break;
+                case "pc":
+                    main.ProblemChecker();
+                    break;
+                default:
+                    SendHelpText();
+                    break;
+            }
+        }
+
+>>>>>>> origin/import-export
         public void SendHelpText()
         {
             string helpText = $@"Usage: {Path.GetFileName(Environment.GetCommandLineArgs()[0])} [action] {"{arguments}"}
@@ -217,6 +405,7 @@ Available actions:
   mods enable, me          Enable all installed mods
   mods disable, md         Disable all installed mods
   mods refresh, mr         Enable/disable mods as specified in modlist.cfg
+  mod export, mex          Export the textures and/or model of an item
   backup, b                Backup clean index files for use in resetting the game
   reset, r                 Reset game to clean state
   problemcheck, pc         Check if there are any problems with the game, mod or backup files
@@ -228,6 +417,7 @@ Available arguments:
   -c, --configdirectory    Full path to directory where FFXIV.cfg and character data is saved, including 'FINAL FANTASY XIV - A Realm Reborn'
   -b, --backupdirectory    Full path to directory with your index backups
   -t, --ttmp               Full path to .ttmp(2) file (modpack import/info only)
+  -n, --name               Name of item to import/export (mod import/export only)
   -w, --wizard             Use the modpack wizard to select what mods to import (modpack import only)
   -a, --all                Import all mods in a modpack immediately (modpack import only)
   -npc, --noproblemcheck   Skip the problem check after importing a modpack
